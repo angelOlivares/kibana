@@ -16,7 +16,7 @@ steps:
   - label: '💪 Performance Tests with Playwright config'
     command: .buildkite/scripts/steps/functional/performance_playwright.sh
     agents:
-      queue: kb-static-ubuntu
+      queue: kb-static-scalability
     depends_on: build
     key: tests
     timeout_in_minutes: 60
