@@ -56,6 +56,22 @@ export const shouldClauseForThreat = (threat: Threat) => {
 
 export const THREAT_DETECTION_INDICATOR_FIELD = 'threat.detection.indicator' as const;
 
+export const THREAT_DETECTION_TIMESTAMP_FIELD = 'threat.detection.timestamp' as const;
+
+const updateMapping = async (client: Client, eventsIndex: string[]) => {
+  await client.indices.putMapping({
+    index: eventsIndex,
+    properties: {
+      [THREAT_DETECTION_INDICATOR_FIELD]: {
+        type: 'keyword',
+      },
+      [THREAT_DETECTION_TIMESTAMP_FIELD]: {
+        type: 'date',
+      },
+    },
+  });
+};
+
 export const mark = async (
   es: Client,
   index: string[],
@@ -68,7 +84,7 @@ export const mark = async (
     query,
     script: {
       lang: 'painless',
-      source: `ctx._source["threat.detection.timestamp"] = params.timestamp; ctx._source["${THREAT_DETECTION_INDICATOR_FIELD}"] = params.indicator`,
+      source: `ctx._source["${THREAT_DETECTION_TIMESTAMP_FIELD}"] = params.timestamp; ctx._source["${THREAT_DETECTION_INDICATOR_FIELD}"] = params.indicator`,
       params: {
         timestamp,
         indicator,
@@ -152,6 +168,10 @@ export const scan = async (
     log(message);
   };
 
+  log('update input indices mapping');
+
+  await updateMapping(client, eventsIndex);
+
   log('starting scan');
 
   const total = await countDocuments(client, threatIndex);
@@ -163,7 +183,7 @@ export const scan = async (
     await async.eachLimit(threats, concurrency, async ({ _source: threat, _id: threatId }) => {
       progress++;
 
-      verboseLog(`processing threats: ${progress}/${total}`);
+      verboseLog(`processing threat ${threatId} (${progress}/${total})`);
 
       if (!threat) {
         verboseLog(`source is missing`);
