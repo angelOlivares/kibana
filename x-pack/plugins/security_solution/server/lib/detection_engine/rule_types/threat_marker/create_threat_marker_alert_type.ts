@@ -90,8 +90,9 @@ export const createThreatMarkerAlertType = (
       ruleExecutionLogger.info('starting Indicator Marker rule');
       const esClient = services.scopedClusterClient.asCurrentUser;
 
-      const EVENTS_INDEX = 'filebeat-url';
-      const THREATS_INDEX = 'logs-ti_*';
+      // TODO use config parameters
+      const EVENTS_INDEX = ['filebeat-url'];
+      const THREATS_INDEX = ['logs-ti_*'];
 
       try {
         // matcher POC

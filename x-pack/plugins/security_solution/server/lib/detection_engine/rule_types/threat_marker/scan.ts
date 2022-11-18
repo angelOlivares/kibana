@@ -58,7 +58,7 @@ export const THREAT_DETECTION_INDICATOR_FIELD = 'threat.detection.indicator' as 
 
 export const mark = async (
   es: Client,
-  index: string,
+  index: string[],
   query: QueryDslQueryContainer,
   indicator: string,
   timestamp: number
@@ -100,12 +100,12 @@ export const getDocuments = async <T = unknown>(
   return hits;
 };
 
-export const countDocuments = async (client: Client, index: string) =>
+export const countDocuments = async (client: Client, index: string[]) =>
   (await client.count({ index })).count;
 
 async function* documentGenerator<T>(
   client: Client,
-  index: string,
+  index: string[],
   query?: QueryDslQueryContainer
 ) {
   let after: SortResults | undefined;
@@ -138,8 +138,8 @@ export const scan = async (
     concurrency,
     verbose,
   }: {
-    threatIndex: string;
-    eventsIndex: string;
+    threatIndex: string[];
+    eventsIndex: string[];
     concurrency: number;
     verbose: boolean;
   }
