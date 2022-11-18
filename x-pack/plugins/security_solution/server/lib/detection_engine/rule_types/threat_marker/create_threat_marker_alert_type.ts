@@ -91,14 +91,14 @@ export const createThreatMarkerAlertType = (
       const esClient = services.scopedClusterClient.asCurrentUser;
 
       // TODO use config parameters
-      const EVENTS_INDEX = ['filebeat-url'];
+      const EVENTS_INDEX = ['filebeat-*'];
       const THREATS_INDEX = ['logs-ti_*'];
 
       try {
         // matcher POC
         await scan(
           { client: esClient as any, log: ruleExecutionLogger.info },
-          { threatIndex: THREATS_INDEX, eventsIndex: EVENTS_INDEX, concurrency: 4, verbose: false }
+          { threatIndex: THREATS_INDEX, eventsIndex: EVENTS_INDEX, concurrency: 8, verbose: false }
         );
       } catch (error: unknown) {
         if (error instanceof Error) {
