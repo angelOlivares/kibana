@@ -37,6 +37,7 @@ import {
   SavedQueryPatchParams,
   ThreatMatchPatchParams,
   ThresholdPatchParams,
+  ThreatMarkerPatchParams,
 } from '../../../../../common/detection_engine/rule_schema';
 
 import {
@@ -75,6 +76,8 @@ import type {
   InternalRuleUpdate,
   NewTermsRuleParams,
   NewTermsSpecificRuleParams,
+  ThreatMarkerRuleParams,
+  ThreatMarkerSpecificRuleParams,
 } from '../../rule_schema';
 import {
   transformActions,
@@ -179,6 +182,16 @@ export const typeSpecificSnakeToCamel = (
         query: params.query,
         newTermsFields: params.new_terms_fields,
         historyWindowStart: params.history_window_start,
+        index: params.index,
+        filters: params.filters,
+        language: params.language ?? 'kuery',
+        dataViewId: params.data_view_id,
+      };
+    }
+    case 'threat_marker': {
+      return {
+        type: params.type,
+        query: params.query,
         index: params.index,
         filters: params.filters,
         language: params.language ?? 'kuery',
@@ -316,6 +329,20 @@ const patchNewTermsParams = (
   };
 };
 
+const patchThreatMarkerParams = (
+  params: ThreatMarkerPatchParams,
+  existingRule: ThreatMarkerRuleParams
+): ThreatMarkerSpecificRuleParams => {
+  return {
+    type: existingRule.type,
+    language: params.language ?? existingRule.language,
+    index: params.index ?? existingRule.index,
+    dataViewId: params.data_view_id ?? existingRule.dataViewId,
+    query: params.query ?? existingRule.query,
+    filters: params.filters ?? existingRule.filters,
+  };
+};
+
 const parseValidationError = (error: string | null): BadRequestError => {
   if (error != null) {
     return new BadRequestError(error);
@@ -382,6 +409,13 @@ export const patchTypeSpecificSnakeToCamel = (
         throw parseValidationError(error);
       }
       return patchNewTermsParams(validated, existingRule);
+    }
+    case 'threat_marker': {
+      const [validated, error] = validateNonExact(params, ThreatMarkerPatchParams);
+      if (validated == null) {
+        throw parseValidationError(error);
+      }
+      return patchThreatMarkerParams(validated, existingRule);
     }
     default: {
       return assertUnreachable(existingRule);
@@ -618,6 +652,16 @@ export const typeSpecificCamelToSnake = (params: TypeSpecificRuleParams): TypeSp
         query: params.query,
         new_terms_fields: params.newTermsFields,
         history_window_start: params.historyWindowStart,
+        index: params.index,
+        filters: params.filters,
+        language: params.language,
+        data_view_id: params.dataViewId,
+      };
+    }
+    case 'threat_marker': {
+      return {
+        type: params.type,
+        query: params.query,
         index: params.index,
         filters: params.filters,
         language: params.language,

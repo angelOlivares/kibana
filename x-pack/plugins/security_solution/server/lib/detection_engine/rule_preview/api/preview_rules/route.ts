@@ -430,6 +430,26 @@ export const previewRulesRoute = async (
               }
             );
             break;
+          case 'threat_marker':
+            const threatMarkerAlertType = previewRuleTypeWrapper(
+              createThreatMarkerAlertType(ruleOptions)
+            );
+            await runExecutors(
+              threatMarkerAlertType.executor,
+              threatMarkerAlertType.id,
+              threatMarkerAlertType.name,
+              previewRuleParams,
+              () => true,
+              {
+                create: alertInstanceFactoryStub,
+                alertLimit: {
+                  getValue: () => 1000,
+                  setLimitReached: () => {},
+                },
+                done: () => ({ getRecoveredAlerts: () => [] }),
+              }
+            );
+            break;
           default:
             assertUnreachable(previewRuleParams);
         }
