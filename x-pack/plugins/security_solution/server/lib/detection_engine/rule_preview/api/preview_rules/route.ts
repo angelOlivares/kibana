@@ -54,6 +54,7 @@ import {
   createQueryAlertType,
   createThresholdAlertType,
   createNewTermsAlertType,
+  createThreatMarkerAlertType,
 } from '../../../rule_types';
 import { createSecurityRuleTypeWrapper } from '../../../rule_types/create_security_rule_type_wrapper';
 import { assertUnreachable } from '../../../../../../common/utility_types';

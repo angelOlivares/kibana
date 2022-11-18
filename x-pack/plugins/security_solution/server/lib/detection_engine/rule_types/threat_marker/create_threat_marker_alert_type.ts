@@ -5,6 +5,9 @@
  * 2.0.
  */
 
+// TODO remove this
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { validateNonExact } from '@kbn/securitysolution-io-ts-utils';
 import { THREAT_MARKER_RULE_TYPE_ID } from '@kbn/securitysolution-rules';
 import { SERVER_APP_ID } from '../../../../../common/constants';
@@ -15,14 +18,11 @@ import type { CreateRuleOptions, SecurityAlertType } from '../types';
 import { validateIndexPatterns } from '../utils';
 
 import { createSearchAfterReturnType, getUnprocessedExceptionsWarnings } from '../../signals/utils';
+import { scan } from './scan';
 
 export const createThreatMarkerAlertType = (
-  createOptions: CreateRuleOptions
+  _createOptions: CreateRuleOptions
 ): SecurityAlertType<ThreatMarkerRuleParams, {}, {}, 'default'> => {
-  const { logger } = createOptions;
-
-  logger.warn(`id=${THREAT_MARKER_RULE_TYPE_ID}`);
-
   return {
     id: THREAT_MARKER_RULE_TYPE_ID,
     name: 'Threat Marker',
@@ -90,18 +90,20 @@ export const createThreatMarkerAlertType = (
       ruleExecutionLogger.info('starting Indicator Marker rule');
       const esClient = services.scopedClusterClient.asCurrentUser;
 
+      const EVENTS_INDEX = 'filebeat-url';
+      const THREATS_INDEX = 'logs-ti_*';
+
       try {
         // matcher POC
-
-        ruleExecutionLogger.info(
-          `doc count=${await (await esClient.count({ index: 'filebeat-*' })).count}`
+        await scan(
+          { client: esClient as any, log: ruleExecutionLogger.info },
+          { threatIndex: THREATS_INDEX, eventsIndex: EVENTS_INDEX, concurrency: 4, verbose: false }
         );
       } catch (error: unknown) {
         if (error instanceof Error) {
           ruleExecutionLogger.error(error.message);
         }
       }
-
       // end matcher POC
 
       const result = createSearchAfterReturnType();
