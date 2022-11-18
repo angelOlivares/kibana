@@ -17,6 +17,7 @@ import {
   isQueryRule,
   isThreatMatchRule,
   isNewTermsRule,
+  isThreatMarkerRule,
 } from '../../../../../common/detection_engine/utils';
 import type { FieldHook } from '../../../../shared_imports';
 import * as i18n from './translations';
@@ -50,6 +51,7 @@ export const SelectRuleType: React.FC<SelectRuleTypeProps> = ({
   const setThreshold = useCallback(() => setType('threshold'), [setType]);
   const setThreatMatch = useCallback(() => setType('threat_match'), [setType]);
   const setNewTerms = useCallback(() => setType('new_terms'), [setType]);
+  const setThreatMarker = useCallback(() => setType('threat_marker'), [setType]);
 
   const eqlSelectableConfig = useMemo(
     () => ({
@@ -98,6 +100,14 @@ export const SelectRuleType: React.FC<SelectRuleTypeProps> = ({
       isSelected: isNewTermsRule(ruleType),
     }),
     [ruleType, setNewTerms]
+  );
+
+  const threatMarkerSelectableConfig = useMemo(
+    () => ({
+      onClick: setThreatMarker,
+      isSelected: isThreatMarkerRule(ruleType),
+    }),
+    [ruleType, setThreatMarker]
   );
 
   // TODO: custom css shouldn't be necessary after https://github.com/elastic/eui/issues/6345
@@ -205,6 +215,20 @@ export const SelectRuleType: React.FC<SelectRuleTypeProps> = ({
               description={i18n.NEW_TERMS_TYPE_DESCRIPTION}
               icon={<EuiIcon size="l" type="magnifyWithPlus" />}
               selectable={newTermsSelectableConfig}
+              layout="horizontal"
+              className={cardStyles}
+            />
+          </EuiFlexItem>
+        )}
+        {(!isUpdateView || threatMarkerSelectableConfig.isSelected) && (
+          <EuiFlexItem>
+            <EuiCard
+              data-test-subj="threatMarkerRuleType"
+              title={i18n.THREAT_MARKER_TYPE_TITLE}
+              titleSize="xs"
+              description={i18n.THREAT_MARKER_TYPE_DESCRIPTION}
+              icon={<EuiIcon size="l" type="magnifyWithPlus" />}
+              selectable={threatMarkerSelectableConfig}
               layout="horizontal"
               className={cardStyles}
             />

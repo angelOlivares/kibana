@@ -87,8 +87,24 @@ export const createThreatMarkerAlertType = (
         state,
       } = execOptions;
 
-      const result = createSearchAfterReturnType();
+      ruleExecutionLogger.info('starting Indicator Marker rule');
+      const esClient = services.scopedClusterClient.asCurrentUser;
 
+      try {
+        // matcher POC
+
+        ruleExecutionLogger.info(
+          `doc count=${await (await esClient.count({ index: 'filebeat-*' })).count}`
+        );
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          ruleExecutionLogger.error(error.message);
+        }
+      }
+
+      // end matcher POC
+
+      const result = createSearchAfterReturnType();
       const exceptionsWarning = getUnprocessedExceptionsWarnings(unprocessedExceptions);
       if (exceptionsWarning) {
         result.warningMessages.push(exceptionsWarning);

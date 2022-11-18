@@ -249,7 +249,6 @@ export type NewTermsRuleParams = t.TypeOf<typeof newTermsRuleParams>;
 
 const threatMarkerSpecificRuleParams = t.type({
   type: t.literal('threat_marker'),
-  query: RuleQuery,
   index: t.union([IndexPatternArray, t.undefined]),
   filters: t.union([RuleFilterArray, t.undefined]),
   language: nonEqlLanguages,

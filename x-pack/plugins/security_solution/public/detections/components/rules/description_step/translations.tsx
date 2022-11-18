@@ -154,3 +154,10 @@ export const ALERT_SUPPRESSION_INSUFFICIENT_LICENSE = i18n.translate(
       'Alert suppression is configured but will not be applied due to insufficient licensing',
   }
 );
+
+export const THREAT_MARKER_TYPE_DESCRIPTION = i18n.translate(
+  'xpack.securitySolution.detectionEngine.createRule.threatMarkerRuleTypeDescription',
+  {
+    defaultMessage: 'Threat Marker',
+  }
+);

@@ -92,3 +92,17 @@ export const NEW_TERMS_TYPE_DESCRIPTION = i18n.translate(
     defaultMessage: 'Find documents with values appearing for the first time.',
   }
 );
+
+export const THREAT_MARKER_TYPE_TITLE = i18n.translate(
+  'xpack.securitySolution.detectionEngine.createRule.stepDefineRule.ruleTypeField.threatMarkerTitle',
+  {
+    defaultMessage: 'Threat Marker',
+  }
+);
+
+export const THREAT_MARKER_TYPE_DESCRIPTION = i18n.translate(
+  'xpack.securitySolution.detectionEngine.createRule.stepDefineRule.ruleTypeField.threatMarkerDescription',
+  {
+    defaultMessage: 'POC: Enrich events with IOC data',
+  }
+);

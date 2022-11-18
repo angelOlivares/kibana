@@ -166,6 +166,18 @@ type NewTermsRuleFields<T> = Omit<
   | 'eqlOptions'
 >;
 
+type ThreatMarkerRuleFields<T> = Omit<
+  T,
+  | 'queryBar'
+  | 'threshold'
+  | 'threatIndex'
+  | 'threatQueryBar'
+  | 'threatMapping'
+  | 'eqlOptions'
+  | 'newTermsFields'
+  | 'historyWindowSize'
+>;
+
 const isMlFields = <T>(
   fields:
     | QueryRuleFields<T>
@@ -174,6 +186,7 @@ const isMlFields = <T>(
     | ThresholdRuleFields<T>
     | ThreatMatchRuleFields<T>
     | NewTermsRuleFields<T>
+    | ThreatMarkerRuleFields<T>
 ): fields is MlRuleFields<T> => has('anomalyThreshold', fields);
 
 const isThresholdFields = <T>(
@@ -184,6 +197,7 @@ const isThresholdFields = <T>(
     | ThresholdRuleFields<T>
     | ThreatMatchRuleFields<T>
     | NewTermsRuleFields<T>
+    | ThreatMarkerRuleFields<T>
 ): fields is ThresholdRuleFields<T> => has('threshold', fields);
 
 const isThreatMatchFields = <T>(
@@ -194,6 +208,7 @@ const isThreatMatchFields = <T>(
     | ThresholdRuleFields<T>
     | ThreatMatchRuleFields<T>
     | NewTermsRuleFields<T>
+    | ThreatMarkerRuleFields<T>
 ): fields is ThreatMatchRuleFields<T> => has('threatIndex', fields);
 
 const isNewTermsFields = <T>(
@@ -204,7 +219,20 @@ const isNewTermsFields = <T>(
     | ThresholdRuleFields<T>
     | ThreatMatchRuleFields<T>
     | NewTermsRuleFields<T>
+    | ThreatMarkerRuleFields<T>
 ): fields is NewTermsRuleFields<T> => has('newTermsFields', fields);
+
+const isThreatMarkerFields = <T>(
+  fields:
+    | QueryRuleFields<T>
+    | EqlQueryRuleFields<T>
+    | MlRuleFields<T>
+    | ThresholdRuleFields<T>
+    | ThreatMatchRuleFields<T>
+    | NewTermsRuleFields<T>
+    | ThreatMarkerRuleFields<T>
+): fields is ThreatMarkerRuleFields<T> =>
+  !has('machineLearningJobId', fields) && !has('queryBar', fields);
 
 const isEqlFields = <T>(
   fields:
@@ -214,6 +242,7 @@ const isEqlFields = <T>(
     | ThresholdRuleFields<T>
     | ThreatMatchRuleFields<T>
     | NewTermsRuleFields<T>
+    | ThreatMarkerRuleFields<T>
 ): fields is EqlQueryRuleFields<T> => has('eqlOptions', fields);
 
 export const filterRuleFieldsForType = <T extends Partial<RuleFields>>(
@@ -225,7 +254,8 @@ export const filterRuleFieldsForType = <T extends Partial<RuleFields>>(
   | MlRuleFields<T>
   | ThresholdRuleFields<T>
   | ThreatMatchRuleFields<T>
-  | NewTermsRuleFields<T> => {
+  | NewTermsRuleFields<T>
+  | ThreatMarkerRuleFields<T> => {
   switch (type) {
     case 'machine_learning':
       const {
@@ -305,6 +335,24 @@ export const filterRuleFieldsForType = <T extends Partial<RuleFields>>(
         ...newTermsRuleFields
       } = fields;
       return newTermsRuleFields;
+    case 'threat_marker':
+      const {
+        queryBar: _q,
+        newTermsFields: _nf,
+        historyWindowSize: _h,
+        anomalyThreshold: ____a,
+        machineLearningJobId: ____m,
+        threshold: ____t,
+        threatIndex: _____removedThreatIndex,
+        threatQueryBar: _____removedThreatQueryBar,
+        threatMapping: _____removedThreatMapping,
+        eqlOptions: _____eqlOptions,
+        ...threatMarkerRuleFields
+      } = fields;
+
+      // TODO broken inference
+      // @ts-ignore
+      return threatMarkerRuleFields;
   }
   assertUnreachable(type);
 };
@@ -357,6 +405,7 @@ export const getStepDataDataSource = (
   return copiedStepData;
 };
 
+// eslint-disable-next-line complexity
 export const formatDefineStepData = (defineStepData: DefineStepRule): DefineStepRuleJson => {
   const stepData = getStepDataDataSource(defineStepData);
 
@@ -433,6 +482,12 @@ export const formatDefineStepData = (defineStepData: DefineStepRule): DefineStep
         query: ruleFields.queryBar?.query?.query as string,
         new_terms_fields: ruleFields.newTermsFields,
         history_window_start: `now-${ruleFields.historyWindowSize}`,
+      }
+    : isThreatMarkerFields(ruleFields)
+    ? {
+        index: ruleFields.index,
+        filters: ruleFields.queryBar?.filters,
+        language: ruleFields.queryBar?.query?.language,
       }
     : {
         ...(ruleFields.groupByFields.length > 0

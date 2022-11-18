@@ -486,7 +486,6 @@ export const NewTermsPatchParams = newTermsSchema.patch;
 const threatMarkerSchema = buildRuleSchemas({
   required: {
     type: t.literal('threat_marker'),
-    query: RuleQuery,
   },
   optional: {
     index: IndexPatternArray,
