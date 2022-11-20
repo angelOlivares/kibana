@@ -87,7 +87,7 @@ while read -r journey; do
         --kibana-install-dir "$KIBANA_BUILD_LOCATION" \
         --debug \
         --bail
-      sleep 90;
+      sleep 20;
     else
       node scripts/functional_tests \
         --config "$journey" \
