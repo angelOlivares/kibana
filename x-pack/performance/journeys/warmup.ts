@@ -94,7 +94,7 @@ export const journey = new Journey({
     expect((asyncSearchResponse.response.hits.total as SearchTotalHits).value).to.be(3);
     expect(asyncSearchResponse.response.aggregations?.the_date).not.to.be(undefined);
   })
-  .step('Open Kibana', async ({page, kbnUrl}) => {
+  .step('Open Kibana', async ({ page, kbnUrl }) => {
     await page.goto(kbnUrl.get(`/app/home`));
     await page.waitForSelector('#app-fixed-viewport');
   })
