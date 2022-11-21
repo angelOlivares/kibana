@@ -96,7 +96,7 @@ export const journey = new Journey({
   })
   .step('Open Kibana', async ({ page, kbnUrl }) => {
     await page.goto(kbnUrl.get(`/app/home`));
-    await page.waitForSelector('#app-fixed-viewport');
+    await page.waitForSelector('.kbnAppWrapper');
   })
   .step('Cleanup', async ({ esClient }) => {
     const resp = await esClient.indices.delete({
