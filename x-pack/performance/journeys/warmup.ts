@@ -8,12 +8,14 @@
 import { SearchTotalHits } from '@elastic/elasticsearch/lib/api/types';
 import { Journey } from '@kbn/journeys';
 import expect from '@kbn/expect';
+import { subj } from '@kbn/test-subj-selector';
+import { waitForVisualizations } from '../utils';
 
 const WARMUP_INDEX_NAME = 'warmup-index';
 
 export const journey = new Journey({
-  esArchives: [],
-  kbnArchives: [],
+  esArchives: ['x-pack/performance/es_archives/sample_data_ecommerce'],
+  kbnArchives: ['x-pack/performance/kbn_archives/ecommerce_tsvb_gauge_only_dashboard'],
 })
   .step('Setup warmup index', async ({ esClient }) => {
     await esClient.indices.create({
@@ -97,6 +99,14 @@ export const journey = new Journey({
   .step('Open Kibana', async ({ page, kbnUrl }) => {
     await page.goto(kbnUrl.get(`/app/home`));
     await page.waitForSelector('.kbnAppWrapper');
+  })
+  .step('Go to Dashboards Page', async ({ page, kbnUrl }) => {
+    await page.goto(kbnUrl.get(`/app/dashboards`));
+    await page.waitForSelector('#dashboardListingHeading');
+  })
+  .step('Go to Ecommerce Dashboard with TSVB Gauge only', async ({ page, log }) => {
+    await page.click(subj('dashboardListingTitleLink-[eCommerce]-TSVB-Gauge-Only-Dashboard'));
+    await waitForVisualizations(page, log, 1);
   })
   .step('Cleanup', async ({ esClient }) => {
     const resp = await esClient.indices.delete({
