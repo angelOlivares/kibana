@@ -100,6 +100,7 @@ export const journey = new Journey({
   .step('Open Kibana', async ({ page, kbnUrl }) => {
     await page.goto(kbnUrl.get(`/app/home`));
     await page.waitForSelector('.kbnAppWrapper');
+    await sleep(1000);
   })
   .step('Go to Dashboards Page', async ({ page, kbnUrl }) => {
     await page.goto(kbnUrl.get(`/app/dashboards`));
