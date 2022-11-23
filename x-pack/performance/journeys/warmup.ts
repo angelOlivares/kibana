@@ -12,6 +12,7 @@ import { subj } from '@kbn/test-subj-selector';
 import { waitForVisualizations } from '../utils';
 
 const WARMUP_INDEX_NAME = 'warmup-index';
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export const journey = new Journey({
   esArchives: ['x-pack/performance/es_archives/sample_data_ecommerce'],
@@ -103,6 +104,7 @@ export const journey = new Journey({
   .step('Go to Dashboards Page', async ({ page, kbnUrl }) => {
     await page.goto(kbnUrl.get(`/app/dashboards`));
     await page.waitForSelector('#dashboardListingHeading');
+    await sleep(1000);
   })
   .step('Go to Ecommerce Dashboard with TSVB Gauge only', async ({ page, log }) => {
     await page.click(subj('dashboardListingTitleLink-[eCommerce]-TSVB-Gauge-Only-Dashboard'));
