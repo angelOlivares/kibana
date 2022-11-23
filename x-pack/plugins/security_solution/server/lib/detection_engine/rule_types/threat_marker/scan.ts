@@ -247,7 +247,12 @@ export const scan = async (
           _index: match.index,
         },
       },
-      { doc: { [THREAT_DETECTION_MATCH_COUNT_FIELD]: match.count } },
+      {
+        doc: {
+          [THREAT_DETECTION_MATCH_COUNT_FIELD]: match.count,
+          [THREAT_DETECTION_TIMESTAMP_FIELD]: Date.now(),
+        },
+      },
     ]);
 
     await client.bulk({ operations });
