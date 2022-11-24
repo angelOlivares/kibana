@@ -11,6 +11,8 @@ import { REPO_ROOT } from '@kbn/utils';
 import Fsp from 'fs/promises';
 import path from 'path';
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 run(
   async ({ log, flagsReader, procRunner }) => {
     async function runFunctionalTest(journey: string, phase: 'TEST' | 'WARMUP') {
@@ -88,9 +90,13 @@ run(
 
     for (const journey of journeys) {
       await startEs();
+      await sleep(5000);
       await runWarmup(journey);
+      await sleep(5000);
       await runTest(journey);
+      await sleep(5000);
       await procRunner.stop('es');
+      await sleep(5000);
     }
   },
   {
